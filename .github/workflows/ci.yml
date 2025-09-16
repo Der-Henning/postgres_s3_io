@@ -29,7 +29,7 @@ jobs:
             sudo YES=yes /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh
             sudo apt update
             sudo apt install -y postgresql-17 postgresql-server-dev-17
-            sudo chown $USER:$USER /usr/lib/postgresql/17
+            sudo chown ${{ github.actor }}:${{ github.actor }} /usr/lib/postgresql/17
 
       - name: Install cargo-pgrx
         run: cargo install cargo-pgrx --locked
