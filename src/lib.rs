@@ -279,9 +279,6 @@ mod testutils;
 #[cfg(any(test, feature = "pg_test"))]
 #[pg_schema]
 mod tests {
-    use core::time;
-    use std::thread;
-
     use crate::testutils::minio_test::MinioServer;
     use pgrx::prelude::*;
 
@@ -302,7 +299,6 @@ mod tests {
             None,
             None,
         );
-        thread::sleep(time::Duration::from_secs(1));
         assert!(crate::s3_object_exists_lazy(
             bucket,
             "hello.txt",
@@ -327,7 +323,6 @@ mod tests {
         assert!(crate::s3_create_bucket(
             bucket, None, None, None, None, None
         ));
-        log!("tests done");
     }
 }
 
@@ -335,8 +330,12 @@ mod tests {
 /// It must be visible at the root of your extension crate.
 #[cfg(test)]
 pub mod pg_test {
+    use core::time;
+    use std::thread;
+
     pub fn setup(_options: Vec<&str>) {
         let _ = crate::testutils::minio_test::ensure_minio_binary();
+        thread::sleep(time::Duration::from_secs(1));
         // perform one-off initialization when the pg_test framework starts
     }
 
