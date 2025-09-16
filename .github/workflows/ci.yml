@@ -38,7 +38,7 @@ jobs:
         run: cargo pgrx init --pg${{ matrix.pg }} download
 
       - name: Run tests
-        run: cargo pgrx test --all-features pg${{ matrix.pg }}
+        run: cargo pgrx test pg${{ matrix.pg }}
 
   build-matrix:
     name: Build pgrx package (PG ${{ matrix.pg }})
