@@ -28,7 +28,7 @@ jobs:
                 build-essential libreadline-dev zlib1g-dev flex bison libxml2-dev \
                 libxslt-dev libssl-dev libxml2-utils xsltproc ccache pkg-config \
                 postgresql-common
-            sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh
+            sudo YES=yes /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh
             sudo apt update
             sudo apt install -y postgresql-17 postgresql-server-dev-17
 
