@@ -27,7 +27,10 @@ jobs:
             sudo apt-get install -y --no-install-recommends \
                 build-essential libreadline-dev zlib1g-dev flex bison libxml2-dev \
                 libxslt-dev libssl-dev libxml2-utils xsltproc ccache pkg-config \
-                postgresql-17 postgresql-server-dev-17
+                postgresql-common
+            sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh
+            sudo apt update
+            sudo apt install -y postgresql-17 postgresql-server-dev-17
 
       - name: Install cargo-pgrx
         run: cargo install cargo-pgrx --locked
