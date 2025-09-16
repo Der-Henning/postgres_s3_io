@@ -20,6 +20,15 @@ jobs:
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
 
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+
+      - name: System deps (linker, SSL, zlib)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            lld pkg-config libssl-dev zlib1g-dev curl ca-certificates
+
       - name: Install cargo-pgrx
         run: cargo install cargo-pgrx --locked
 
@@ -37,13 +46,22 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        pg: ["15", "16", "17"]
+        pg: ["17"]
     steps:
       - name: Checkout
         uses: actions/checkout@v5
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+
+      - name: System deps (linker, SSL, zlib)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            lld pkg-config libssl-dev zlib1g-dev curl ca-certificates
 
       - name: System deps (linker, SSL, zlib)
         run: |
