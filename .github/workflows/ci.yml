@@ -9,10 +9,6 @@ jobs:
   test:
     name: Cargo tests
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        pg: ["17"]
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -34,11 +30,11 @@ jobs:
       - name: Install cargo-pgrx
         run: cargo install cargo-pgrx --locked
 
-      - name: Initialize pgrx toolchains (download PG${{ matrix.pg }})
-        run: cargo pgrx init --pg${{ matrix.pg }} download
+      - name: Initialize pgrx toolchains (download PostgreSQL)
+        run: cargo pgrx init download
 
       - name: Run tests
-        run: cargo pgrx test pg${{ matrix.pg }}
+        run: cargo pgrx test
 
   build-matrix:
     name: Build pgrx package (PG ${{ matrix.pg }})

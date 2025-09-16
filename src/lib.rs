@@ -274,6 +274,8 @@ mod testutils;
 #[cfg(any(test, feature = "pg_test"))]
 #[pg_schema]
 mod tests {
+    use core::time;
+
     use crate::testutils::minio_test::MinioServer;
     use pgrx::prelude::*;
 
@@ -294,6 +296,7 @@ mod tests {
             None,
             None,
         );
+        thread::sleep(time::Duration::from_secs(1));
         assert!(crate::s3_object_exists_lazy(
             bucket,
             "hello.txt",
