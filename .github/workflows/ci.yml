@@ -22,6 +22,8 @@ jobs:
 
       - name: Cache cargo
         uses: Swatinem/rust-cache@v2
+        with:
+            cache-directories: ~/.pgrx
 
       - name: System deps (linker, SSL, zlib)
         run: |
@@ -36,7 +38,7 @@ jobs:
         run: cargo pgrx init --pg${{ matrix.pg }} download
 
       - name: Run tests
-        run: cargo pgrx test --all-features
+        run: cargo pgrx test --all-features pg${{ matrix.pg }}
 
   build-matrix:
     name: Build pgrx package (PG ${{ matrix.pg }})
