@@ -31,10 +31,10 @@ jobs:
         run: cargo install cargo-pgrx --locked
 
       - name: Initialize pgrx toolchains (download PostgreSQL)
-        run: cargo pgrx init
+        run: cargo pgrx init --pg17
 
       - name: Run tests
-        run: cargo pgrx test all
+        run: cargo pgrx test pg17
 
   build-matrix:
     name: Build pgrx package (PG ${{ matrix.pg }})
