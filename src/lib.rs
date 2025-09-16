@@ -1,6 +1,7 @@
 use pgrx::prelude::*;
 use std::{
-    collections::HashMap, sync::{Mutex, OnceLock}
+    collections::HashMap,
+    sync::{Mutex, OnceLock},
 };
 
 ::pgrx::pg_module_magic!(name, version);
@@ -154,7 +155,11 @@ fn s3_get_object(
         let req = client.get_object().bucket(bucket).key(object_key);
 
         match req.send().await {
-            Ok(out) => out.body.collect().await.map_err(|e| format!("Collect error: {e:?}")),
+            Ok(out) => out
+                .body
+                .collect()
+                .await
+                .map_err(|e| format!("Collect error: {e:?}")),
             Err(aws_sdk_s3::error::SdkError::DispatchFailure(e)) => {
                 Err(format!("Dispatch failure: {e:?}"))
             }
@@ -275,6 +280,7 @@ mod testutils;
 #[pg_schema]
 mod tests {
     use core::time;
+    use std::thread;
 
     use crate::testutils::minio_test::MinioServer;
     use pgrx::prelude::*;
