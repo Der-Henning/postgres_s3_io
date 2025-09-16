@@ -2,8 +2,8 @@ name: CI & Release
 
 on:
   push:
-    branches: ["main"]          # run tests on every main push
-    tags: ["v*"]                # also trigger on version tags
+    branches: [main] # run tests on every main push
+    tags: ["v*"] # also trigger on version tags
 
 jobs:
   test:
@@ -21,7 +21,7 @@ jobs:
 
   build-matrix:
     name: Build pgrx package (PG ${{ matrix.pg }})
-    if: startsWith(github.ref, 'refs/tags/')    # only for tags
+    if: startsWith(github.ref, 'refs/tags/') # only for tags
     needs: test
     runs-on: ubuntu-latest
     strategy:
