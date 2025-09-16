@@ -1,0 +1,97 @@
+name: CI & Release
+
+on:
+  push:
+    branches: ["main"]          # run tests on every main push
+    tags: ["v*"]                # also trigger on version tags
+
+jobs:
+  test:
+    name: Cargo tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+
+      - name: Run tests
+        run: cargo test --all --locked --all-features
+
+  build-matrix:
+    name: Build pgrx package (PG ${{ matrix.pg }})
+    if: startsWith(github.ref, 'refs/tags/')    # only for tags
+    needs: test
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        pg: ["15", "16", "17"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+
+      - name: System deps (linker, SSL, zlib)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            lld pkg-config libssl-dev zlib1g-dev curl ca-certificates
+
+      - name: Install cargo-pgrx
+        run: cargo install cargo-pgrx --locked
+
+      - name: Initialize pgrx toolchains (download PG${{ matrix.pg }})
+        run: cargo pgrx init --pg${{ matrix.pg }} download
+
+      - name: Build & package extension for PG${{ matrix.pg }}
+        run: |
+          cargo pgrx package --release --pg${{ matrix.pg }}
+          ls -la target/release || true
+
+      - name: Upload artifact (PG${{ matrix.pg }})
+        uses: actions/upload-artifact@v4
+        with:
+          name: artifacts-pg${{ matrix.pg }}
+          path: |
+            target/release/*-pg${{ matrix.pg }}.zip
+            target/release/*-pg${{ matrix.pg }}.zip.sha256  # in case you generate checksums
+          if-no-files-found: error
+
+  publish-release:
+    name: Create GitHub Release
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: build-matrix
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: artifacts-pg*
+          merge-multiple: true
+
+      - name: List downloaded files
+        run: ls -la
+
+      - name: Create Release and upload assets
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          files: |
+            *-pg*.zip
+            *-pg*.zip.sha256
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
