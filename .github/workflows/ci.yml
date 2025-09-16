@@ -24,15 +24,16 @@ jobs:
       - name: Install system deps
         run: |
             sudo apt-get update
-            sudo apt-get upgrade -y
             sudo apt-get install -y --no-install-recommends \
-                build-essential libreadline-dev zlib1g-dev flex bison libxml2-dev libxslt-dev libssl-dev libxml2-utils xsltproc ccache pkg-config
+                build-essential libreadline-dev zlib1g-dev flex bison libxml2-dev \
+                libxslt-dev libssl-dev libxml2-utils xsltproc ccache pkg-config \
+                postgresql-17 postgresql-server-dev-17
 
       - name: Install cargo-pgrx
         run: cargo install cargo-pgrx --locked
 
       - name: Initialize pgrx toolchains (download PostgreSQL)
-        run: cargo pgrx init --pg17 download
+        run: cargo pgrx init --pg17 /usr/lib/postgresql/17/bin/pg_config
 
       - name: Run tests
         run: cargo pgrx test pg17
@@ -55,13 +56,15 @@ jobs:
 
       - name: Cache cargo
         uses: Swatinem/rust-cache@v2
+        with:
+            cache-directories: ~/.pgrx
 
-      - name: System deps (linker, SSL, zlib)
+      - name: Install system deps
         run: |
             sudo apt-get update
-            sudo apt-get upgrade -y
             sudo apt-get install -y --no-install-recommends \
-                build-essential libreadline-dev zlib1g-dev flex bison libxml2-dev libxslt-dev libssl-dev libxml2-utils xsltproc ccache pkg-config
+                build-essential libreadline-dev zlib1g-dev flex bison \
+                libxml2-dev libxslt-dev libssl-dev libxml2-utils xsltproc ccache pkg-config
 
       - name: Install cargo-pgrx
         run: cargo install cargo-pgrx --locked
