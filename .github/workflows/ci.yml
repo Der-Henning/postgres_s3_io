@@ -9,12 +9,22 @@ jobs:
   test:
     name: Cargo tests
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        pg: ["15", "16", "17"]
     steps:
       - name: Checkout
         uses: actions/checkout@v5
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
+
+      - name: Install cargo-pgrx
+        run: cargo install cargo-pgrx --locked
+
+      - name: Initialize pgrx toolchains (download PG${{ matrix.pg }})
+        run: cargo pgrx init --pg${{ matrix.pg }} download
 
       - name: Run tests
         run: cargo pgrx test --all-features
