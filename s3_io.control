@@ -1,0 +1,6 @@
+comment = 's3_io:  Created by pgrx'
+default_version = '@CARGO_VERSION@'
+module_pathname = 's3_io'
+relocatable = false
+superuser = true
+trusted = false

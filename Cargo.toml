@@ -1,0 +1,46 @@
+[package]
+name = "s3_io"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+
+[[bin]]
+name = "pgrx_embed_s3_io"
+path = "./src/bin/pgrx_embed.rs"
+
+[features]
+default = ["pg17"]
+pg13 = ["pgrx/pg13", "pgrx-tests/pg13" ]
+pg14 = ["pgrx/pg14", "pgrx-tests/pg14" ]
+pg15 = ["pgrx/pg15", "pgrx-tests/pg15" ]
+pg16 = ["pgrx/pg16", "pgrx-tests/pg16" ]
+pg17 = ["pgrx/pg17", "pgrx-tests/pg17" ]
+pg18 = ["pgrx/pg18", "pgrx-tests/pg18" ]
+pg_test = ["reqwest", "tempfile", "anyhow"]
+
+[dependencies]
+pgrx = "=0.16.0"
+tokio = { version = "1", features = ["rt"] }
+aws-config = "1"
+aws-sdk-s3 = "1"
+aws-types = "1"
+aws-smithy-types = "1"
+aws-credential-types = { version = "1", features = [ "hardcoded-credentials" ] }
+reqwest  = { version = "0.12", default-features = false, features = [ "rustls-tls", "blocking" ], optional = true }
+tempfile = { version = "3", optional = true }
+anyhow   = { version = "1", optional = true }
+
+[dev-dependencies]
+pgrx-tests = "=0.16.0"
+s3_io = { path = ".", features = ["pg_test"] }
+
+[profile.dev]
+panic = "unwind"
+
+[profile.release]
+panic = "unwind"
+opt-level = 3
+lto = "fat"
+codegen-units = 1
