@@ -31,7 +31,7 @@ jobs:
         run: cargo install cargo-pgrx --locked
 
       - name: Initialize pgrx toolchains (download PostgreSQL)
-        run: cargo pgrx init --pg17
+        run: cargo pgrx init --pg17 download
 
       - name: Run tests
         run: cargo pgrx test pg17
