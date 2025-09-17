@@ -2,7 +2,7 @@ name: CI & Release
 
 on:
   push:
-    branches: [main] # run tests on every main push
+    branches: ["main"] # run tests on every main push
     tags: ["v*"] # also trigger on version tags
 
 jobs:
@@ -19,22 +19,22 @@ jobs:
       - name: Cache cargo
         uses: Swatinem/rust-cache@v2
 
-      - name: Install system deps
+      - name: Install PostgreSQL
         run: |
-            sudo apt-get update
-            sudo apt-get install -y --no-install-recommends \
-                build-essential libreadline-dev zlib1g-dev flex bison libxml2-dev \
-                libxslt-dev libssl-dev libxml2-utils xsltproc ccache pkg-config \
-                postgresql-common
-            sudo YES=yes /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh
-            sudo apt update
-            sudo apt install -y postgresql-17 postgresql-server-dev-17
-            sudo chown -R runner:runner /usr/lib/postgresql/17 /usr/share/postgresql/17
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+              build-essential libreadline-dev zlib1g-dev flex bison libxml2-dev \
+              libxslt-dev libssl-dev libxml2-utils xsltproc ccache pkg-config \
+              postgresql-common
+          sudo YES=yes /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh
+          sudo apt update
+          sudo apt install -y postgresql-17 postgresql-server-dev-17
+          sudo chown -R runner:runner /usr/lib/postgresql /usr/share/postgresql
 
       - name: Install cargo-pgrx
         run: cargo install cargo-pgrx --locked
 
-      - name: Initialize pgrx toolchains (download PostgreSQL)
+      - name: Initialize pgrx toolchains
         run: cargo pgrx init --pg17 /usr/lib/postgresql/17/bin/pg_config
 
       - name: Run tests
@@ -58,21 +58,24 @@ jobs:
 
       - name: Cache cargo
         uses: Swatinem/rust-cache@v2
-        with:
-            cache-directories: ~/.pgrx
 
-      - name: Install system deps
+      - name: Install PostgreSQL
         run: |
-            sudo apt-get update
-            sudo apt-get install -y --no-install-recommends \
-                build-essential libreadline-dev zlib1g-dev flex bison \
-                libxml2-dev libxslt-dev libssl-dev libxml2-utils xsltproc ccache pkg-config
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+              build-essential libreadline-dev zlib1g-dev flex bison libxml2-dev \
+              libxslt-dev libssl-dev libxml2-utils xsltproc ccache pkg-config \
+              postgresql-common
+          sudo YES=yes /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh
+          sudo apt update
+          sudo apt install -y postgresql-${{ matrix.pg }} postgresql-server-dev-${{ matrix.pg }}
+          sudo chown -R runner:runner /usr/lib/postgresql /usr/share/postgresql
 
       - name: Install cargo-pgrx
         run: cargo install cargo-pgrx --locked
 
-      - name: Initialize pgrx toolchains (download PG${{ matrix.pg }})
-        run: cargo pgrx init --pg${{ matrix.pg }} download
+      - name: Initialize pgrx toolchains
+        run: cargo pgrx init --pg${{ matrix.pg }} /usr/lib/postgresql/${{ matrix.pg }}/bin/pg_config
 
       - name: Build & package extension for PG${{ matrix.pg }}
         run: |
